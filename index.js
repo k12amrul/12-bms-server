@@ -40,7 +40,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-   
+
 
     const database = client.db("bmsDB");
     const apartmentsCollection = database.collection("apartments");
@@ -50,83 +50,108 @@ async function run() {
     // const usersCollection = database.collection("users");
 
 
-app.get( '/apartments' ,async ( req , res ) => {
+    app.get('/apartments', async (req, res) => {
 
-  const result = await apartmentsCollection.find( ).toArray( )
+      const result = await apartmentsCollection.find().toArray()
 
-  res.send( result )
+      res.send(result)
 
-})
+    })
 
-app.get('/agreements' , async  ( req, res ) =>{
-
-
-  const result =await agreementsCollection.find( ).toArray()
-  res.send( result)
-
-})
-
-   
-app.post('/agreements', async ( req ,res ) =>{
-  const agreement = req.body
-console.log( agreement )
- 
-const query = { email : agreement.email }
-const exitingAgreement = await agreementsCollection.findOne( query)
-
-if( exitingAgreement ){
-  return res.send( { message : 'you already agreement '})
-}
-const result = await agreementsCollection.insertOne( agreement )
-res.send( result )
+    app.get('/agreements', async (req, res) => {
 
 
-} )
+      const result = await agreementsCollection.find().toArray()
+      res.send(result)
+
+    })
 
 
-app.get('/users', async (req, res) => {
+    app.post('/agreements', async (req, res) => {
+      const agreement = req.body
+      // console.log( agreement )
 
-  const result = await usersCollection.find().toArray()
-  res.send(result)
+      const query = { email: agreement.email }
+      const exitingAgreement = await agreementsCollection.findOne(query)
 
-})
-
-app.post('/users', async (req, res) => {
-  const user = req.body
-  const query = { email: user.email }
-  const exitingUser = await usersCollection.findOne(query)
-  if (exitingUser) {
-    return res.send({ message: 'already exiting User' })
-  }
-
-  const result = await usersCollection.insertOne(user)
-
-  res.send(result)
+      if (exitingAgreement) {
+        return res.send({ message: 'you already agreement ' })
+      }
+      const result = await agreementsCollection.insertOne(agreement)
+      res.send(result)
 
 
-})
+    })
+
+
+    app.get('/users', async (req, res) => {
+
+      const result = await usersCollection.find().toArray()
+      res.send(result)
+
+    })
+
+    app.get('/user/:email', async (req, res) => {
+      const email = req.params.email
+      // console.log( email )
+      const query = { email: email }
+      const result = await usersCollection.findOne(query)
+      res.send(result)
+
+    })
+
+
+
+    app.post('/users', async (req, res) => {
+      const user = req.body
+      const query = { email: user.email }
+      const exitingUser = await usersCollection.findOne(query)
+      if (exitingUser) {
+        return res.send({ message: 'already exiting User' })
+      }
+
+      const result = await usersCollection.insertOne(user)
+
+      res.send(result)
+
+
+    })
+
+    app.patch('/user/update/:email', async (req, res) => {
+      const email = req.params.email
+      const user = req.body
+      const query = { email }
+      const updatedDoc = {
+        $set: {
+          ...user, time: Date.now()
+       
+
+        }
+      }
+      const result = await usersCollection.updateOne(query ,updatedDoc )
+      res.send(result)
+    })
 
 
 
     app.get('/', (req, res) => {
-        res.send('a-12 server testing successfully ')
-      })
-  
-  
-  
-  
-  
-  
-    } finally {
-  
-    }
+      res.send('a-12 server testing successfully ')
+    })
+
+
+
+
+
+
+  } finally {
+
   }
-  run().catch(console.dir);
-  
-  
-  
-  
-  app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-  })
-  
+}
+run().catch(console.dir);
+
+
+
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
