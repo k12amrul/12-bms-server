@@ -87,6 +87,7 @@ async function run() {
     app.patch('/agreement/update/:id', async (req, res) => {
       const id = req.params.id
       const agreement = req.body
+      console.log( req.body)
       const query = { _id : new ObjectId( id ) }
       const updatedDoc = {
         $set: {
