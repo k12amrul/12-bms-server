@@ -83,6 +83,23 @@ async function run() {
 
     })
 
+    
+    app.patch('/agreement/update/:id', async (req, res) => {
+      const id = req.params.id
+      const agreement = req.body
+      const query = { _id : new ObjectId( id ) }
+      const updatedDoc = {
+        $set: {
+          // ...agreement 
+          status  : agreement.status 
+       
+
+        }
+      }
+      const result = await agreementsCollection.updateOne(query ,updatedDoc )
+      res.send(result)
+    })
+
 
     app.get('/users', async (req, res) => {
 
@@ -117,13 +134,15 @@ async function run() {
 
     })
 
-    app.patch('/user/update/:email', async (req, res) => {
-      const email = req.params.email
+    app.patch('/user/update', async (req, res) => {
+      // const id = req.params.id
       const user = req.body
-      const query = { email }
+      console.log( user)
+      const email = user?.email
+      const query = { email : email    }
       const updatedDoc = {
         $set: {
-          ...user, time: Date.now()
+          role : user.role, time: Date.now()
        
 
         }
