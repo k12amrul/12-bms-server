@@ -60,8 +60,10 @@ async function run() {
 
     app.get('/agreements', async (req, res) => {
 
-
-      const result = await agreementsCollection.find().toArray()
+      // const query = {
+      //   status : 'pending'
+      // }
+      const result = await agreementsCollection.find( ).toArray()
       res.send(result)
 
     })
@@ -83,21 +85,22 @@ async function run() {
 
     })
 
-    
+
     app.patch('/agreement/update/:id', async (req, res) => {
       const id = req.params.id
       const agreement = req.body
-      console.log( req.body)
-      const query = { _id : new ObjectId( id ) }
+      // console.log( req.body)
+      // console.log( req)
+      const query = { _id: new ObjectId(id) }
       const updatedDoc = {
         $set: {
           // ...agreement 
-          status  : agreement.status 
-       
+          status: agreement.status
+
 
         }
       }
-      const result = await agreementsCollection.updateOne(query ,updatedDoc )
+      const result = await agreementsCollection.updateOne(query, updatedDoc)
       res.send(result)
     })
 
@@ -138,17 +141,17 @@ async function run() {
     app.patch('/user/update', async (req, res) => {
       // const id = req.params.id
       const user = req.body
-      console.log( user)
+      console.log(user)
       const email = user?.email
-      const query = { email : email    }
+      const query = { email: email }
       const updatedDoc = {
         $set: {
-          role : user.role, time: Date.now()
-       
+          role: user.role, time: Date.now()
+
 
         }
       }
-      const result = await usersCollection.updateOne(query ,updatedDoc )
+      const result = await usersCollection.updateOne(query, updatedDoc)
       res.send(result)
     })
 
