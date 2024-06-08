@@ -46,7 +46,7 @@ async function run() {
     const apartmentsCollection = database.collection("apartments");
     const usersCollection = database.collection("users");
     const agreementsCollection = database.collection("agreements");
-    // const artsCollection = database.collection("arts");
+    const announceCollection = database.collection("announce");
     // const usersCollection = database.collection("users");
 
 
@@ -63,7 +63,7 @@ async function run() {
       // const query = {
       //   status : 'pending'
       // }
-      const result = await agreementsCollection.find( ).toArray()
+      const result = await agreementsCollection.find().toArray()
       res.send(result)
 
     })
@@ -102,6 +102,17 @@ async function run() {
       }
       const result = await agreementsCollection.updateOne(query, updatedDoc)
       res.send(result)
+    })
+
+    // Make announcement:
+
+    app.post('/announcement', async (req, res) => {
+
+      const announcement = req.body
+
+      const result = await announceCollection.insertOne(announcement)
+      res.send(result)
+
     })
 
 
