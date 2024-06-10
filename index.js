@@ -102,7 +102,7 @@ async function run() {
     })
 
 
-    app.patch('/agreement/update/:id', async (req, res) => {
+    app.put('/agreement/update/:id', async (req, res) => {
       const id = req.params.id
       const agreement = req.body
       // console.log( req.body)
@@ -111,7 +111,8 @@ async function run() {
       const updatedDoc = {
         $set: {
           // ...agreement 
-          status: agreement.status
+          status: agreement.status,
+          agreementAcceptDate : new Date(),
 
 
         }
@@ -130,6 +131,13 @@ async function run() {
       res.send(result)
 
     })
+
+    app.get( '/announcement' ,async (req ,res ) => {
+
+
+      const result = await announceCollection.find( ).toArray()
+      res.send( result)
+    } )
 
 
     app.get('/users', async (req, res) => {
@@ -165,7 +173,7 @@ async function run() {
 
     })
 
-    app.patch('/user/update', async (req, res) => {
+    app.put('/user/update', async (req, res) => {
       // const id = req.params.id
       const user = req.body
       console.log(user)
@@ -173,7 +181,7 @@ async function run() {
       const query = { email: email }
       const updatedDoc = {
         $set: {
-          role: user.role, time: Date.now()
+          role: user.role, time: new Date()
 
 
         }
