@@ -9,6 +9,7 @@ const port = process.env.PORT || 5000
 // const cookieParser = require('cookie-parser')
 // const jwt = require('jsonwebtoken');
 
+// console.log(process.env.STRIPE_SERVER_KEY)
 
 app.use(cors())
 // app.use(cors({ 
@@ -47,32 +48,102 @@ async function run() {
     const usersCollection = database.collection("users");
     const agreementsCollection = database.collection("agreements");
     const announceCollection = database.collection("announce");
+    const paymentsCollection = database.collection("payments");
     // const usersCollection = database.collection("users");
 
 
 
-    app.post("/create-payment-intent", async (req, res) => {
-      const { price  } = req.body; 
-      const amount = parseInt( price* 100 )
+    // app.post("/create-payment-intent", async (req, res) => {
+    //   const { price  , name, email ,address } = req.body;
+
+
+    //   console.log(price )
+
+    //   const amount = parseInt(price * 100)
+
+    //   const customer = await stripe.customers.create({
+    //     name,
+    //     email,
+    //     address,
+    //   });
+
+    //   // Create a payment intent
+    //   const paymentIntent = await stripe.paymentIntents.create({
+    //     amount,
+    //     currency : 'usd' ,
+    //     customer: customer.id,
+    //     description: `Payment for ${name}`,
+    //   });
+
+    //   // const paymentIntent = await stripe.paymentIntents.create({
+    //   //   amount: amount,
+    //   //   currency: 'usd',
+    //   //   payment_method_types: ['card']
+    //   // });
+
+    //   res.send({
+    //     clientSecret: paymentIntent.client_secret
+    //   })
+
+    // })
+
+    app.post('/create-payment-intent', async (req, res) => {
+      const { price } = req.body;
+      const amount = parseInt(price * 100);
+      console.log(amount, 'amount inside the intent')
+
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
         currency: 'usd',
         payment_method_types: ['card']
       });
 
+      // console.log( {paymentIntent })
       res.send({
         clientSecret: paymentIntent.client_secret
       })
+    });
 
+
+    app.post('/payments', async (req, res) => {
+      const payment = req.body;
+      const paymentResult = await paymentsCollection.insertOne(payment);
+
+      res.send(paymentResult)
+
+    })
+
+    app.get(  '/payments' , async (req ,res) =>{
+      const email =req.params.email 
+      const query = { email }
+
+      const result = await paymentsCollection.find( )
+      res.send( result )
+       
+    })
+
+
+    // apartmentcount
+
+    app.get('/apartmentcount', async (req, res) => {
+
+      const count = await apartmentsCollection.estimatedDocumentCount()
+      res.send({ count })
     })
 
     app.get('/apartments', async (req, res) => {
+      const page = parseInt(req?.query.page)
+      const size = parseInt(req?.query.size)
 
-      const result = await apartmentsCollection.find().toArray()
-
+      console.log('pagination query ', page , size   )
+      const result = await apartmentsCollection.find()
+      .skip(  page * size  )
+      .limit(size  )
+      .toArray()
       res.send(result)
 
     })
+
 
     app.get('/agreements', async (req, res) => {
 
@@ -80,6 +151,17 @@ async function run() {
       //   status : 'pending'
       // }
       const result = await agreementsCollection.find().toArray()
+      res.send(result)
+
+    })
+    app.get('/agreements/:email', async (req, res) => {
+      const email = req?.params.email
+
+
+      const query = {
+        email
+      }
+      const result = await agreementsCollection.find(query).toArray()
       res.send(result)
 
     })
@@ -112,7 +194,7 @@ async function run() {
         $set: {
           // ...agreement 
           status: agreement.status,
-          agreementAcceptDate : new Date(),
+          agreementAcceptDate: new Date(),
 
 
         }
@@ -132,12 +214,12 @@ async function run() {
 
     })
 
-    app.get( '/announcement' ,async (req ,res ) => {
+    app.get('/announcement', async (req, res) => {
 
 
-      const result = await announceCollection.find( ).toArray()
-      res.send( result)
-    } )
+      const result = await announceCollection.find().toArray()
+      res.send(result)
+    })
 
 
     app.get('/users', async (req, res) => {
