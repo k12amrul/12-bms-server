@@ -113,13 +113,13 @@ async function run() {
 
     })
 
-    app.get(  '/payments' , async (req ,res) =>{
-      const email =req.params.email 
-      const query = { email }
+    app.get('/payments', async (req, res) => {
+      // const email =req.body.email 
+      // const query = { email   }
 
-      const result = await paymentsCollection.find( )
-      res.send( result )
-       
+      const result = await paymentsCollection.find().toArray()
+      res.send(result)
+
     })
 
 
@@ -135,11 +135,11 @@ async function run() {
       const page = parseInt(req?.query.page)
       const size = parseInt(req?.query.size)
 
-      console.log('pagination query ', page , size   )
+      console.log('pagination query ', page, size)
       const result = await apartmentsCollection.find()
-      .skip(  page * size  )
-      .limit(size  )
-      .toArray()
+        .skip(page * size)
+        .limit(size)
+        .toArray()
       res.send(result)
 
     })
@@ -215,15 +215,12 @@ async function run() {
     })
 
     app.get('/announcement', async (req, res) => {
-
-
       const result = await announceCollection.find().toArray()
       res.send(result)
     })
 
 
     app.get('/users', async (req, res) => {
-
       const result = await usersCollection.find().toArray()
       res.send(result)
 
