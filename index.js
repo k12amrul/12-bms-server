@@ -49,7 +49,7 @@ async function run() {
     const agreementsCollection = database.collection("agreements");
     const announceCollection = database.collection("announce");
     const paymentsCollection = database.collection("payments");
-    // const usersCollection = database.collection("users");
+    const couponsCollection = database.collection("coupons");
 
 
 
@@ -171,7 +171,7 @@ async function run() {
       const agreement = req.body
       // console.log( agreement )
 
-      const query = { email: agreement.email }
+      const query = { email: agreement.email  }
       const exitingAgreement = await agreementsCollection.findOne(query)
 
       if (exitingAgreement) {
@@ -216,6 +216,63 @@ async function run() {
 
     app.get('/announcement', async (req, res) => {
       const result = await announceCollection.find().toArray()
+      res.send(result)
+    })
+
+    app.get('/coupons', async (req, res) => {
+      const result = await couponsCollection.find().toArray()
+      res.send(result)
+    })
+
+    app.get('/coupons/:id', async (req, res) => {
+      const id = req?.params?.id
+      const query = { _id : new ObjectId( id )}
+      const result = await couponsCollection.find(query )
+      res.send(result)
+    })
+
+
+    app.post('/coupon', async (req, res) => {
+      const coupon = req.body;
+      const result = await couponsCollection.insertOne(coupon);
+
+      res.send(result)
+
+    })
+
+    app.put('coupon/:id' , async ( req ,res ) => {
+      const id = req.params.id
+      const updatedCopon = req.body
+      // console.log( req.body)
+      // console.log( req)
+      const query = { _id: new ObjectId(id) }
+      const updatedDoc = {
+        $set: {
+          ...updatedCopon 
+        }
+      }
+      const result = await couponsCollection.updateOne(query, updatedDoc)
+      res.send(result)
+      
+    } )
+
+
+    app.put('/agreement/update/:id', async (req, res) => {
+      const id = req.params.id
+      const agreement = req.body
+      // console.log( req.body)
+      // console.log( req)
+      const query = { _id: new ObjectId(id) }
+      const updatedDoc = {
+        $set: {
+          // ...agreement 
+          status: agreement.status,
+          agreementAcceptDate: new Date(),
+
+
+        }
+      }
+      const result = await agreementsCollection.updateOne(query, updatedDoc)
       res.send(result)
     })
 
